@@ -1,0 +1,56 @@
+[
+  {
+    "id": 1,
+    "question": "Which company does this logo belong to?",
+    "image": "images/Company2.png",
+    "answerImage": "images/company122.webp",
+    "options": ["Zirper", "Google", "Apple", "LakeBirds"],
+    "correctAnswer": ["Zirper"],
+    "type": "single"
+  },
+  {
+    "id": 2,
+    "question": "Which 3 proramming languages are for web development?",
+    "image": "images/question.webp",
+    "answerImage": "images/Prog.png",
+    "options": ["C++, Python, Java,", "Lua, Python, C++", "HTML, CSS, JavaScript", "None of the above"],
+    "correctAnswer": ["HTML, CSS, JavaScript"],
+    "type": "single"
+  },
+  {
+    "id": 3,
+    "question": "Which company makes this car?",
+    "image": "images/RMC.webp",
+    "answerImage": "images/RMC.webp",
+    "options": ["Tesla", "Rollor Motor Company", "BMW", "Audi"],
+    "correctAnswer": ["Rollor Motor Company"],
+    "type": "single"
+  },
+  {
+    "id": 4,
+    "question": "Which flavor or chips do americans prefer?",
+    "image": "images/Mystery1.png",
+    "answerImage": "images/Flavor1.png",
+    "options": ["Takoyaki", "Plain salted", "barbecue", "sour cream & onion"],
+    "correctAnswer": ["Takoyaki"],
+    "type": "single"
+  },
+  {
+    "id": 5,
+    "question": "Which TWO games offer the best user experience? (Select 2)",
+    "image": "images/games.webp",
+    "answerImage": "images/games1.webp",
+    "options": ["Woodville County", "Emergency Response: Liberty County", "Emergency Services: Vanguard County", "Greenville"],
+    "correctAnswer": ["Woodville County", "Emergency Services: Vanguard County"],
+    "type": "multiple"
+  },
+  {
+    "id": 6,
+    "question": "Which video game studio uses this mascot?",
+    "image": "images/Speed.png",
+    "answerImage": "images/City.png",
+    "options": ["Salt Lake City, Utah", "Cedarvale, Montana", "North Pole,Alaska", "None of the above"],
+    "correctAnswer": ["Cedarvale, Montana"],
+    "type": "single"
+  }
+]

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Logo Quiz</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px 10px;
+    }
+
+    .quiz-container {
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .card .question-text {
+      margin-bottom: 16px;
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .card img {
+      width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 8px;
+      background-color: #f0f0f0;
+      margin-bottom: 16px;
+    }
+
+    .options-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .btn-option {
+      background-color: #f0f2f5;
+      border: 2px solid #e4e6eb;
+      border-radius: 8px;
+      padding: 12px 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-align: center;
+    }
+
+    .btn-option:hover {
+      background-color: #e4e6eb;
+    }
+
+    .btn-option.selected {
+      border-color: #007bff;
+      background-color: #e6f0ff;
+    }
+
+    .result-badge {
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin-bottom: 12px;
+    }
+
+    .result-badge.correct {
+      color: #28a745;
+    }
+
+    .result-badge.incorrect {
+      color: #dc3545;
+    }
+
+    .answer-info {
+      background-color: #eef9f2;
+      border: 1px solid #b7ebc6;
+      color: #1e7e34;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: bold;
+      width: 100%;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+
+    .action-btn {
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 0.95rem;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .action-btn:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <div class="card" id="quizCard">
+      <!-- Dynamic View -->
+    </div>
+  </div>
+
+  <script>
+    let questions = [];
+    let currentIndex = 0;
+    let selectedAnswers = new Set();
+    let score = 0;
+
+    async function initQuiz() {
+      try {
+        const response = await fetch('questions.json');
+        questions = await response.json();
+        renderQuestionPage();
+      } catch (error) {
+        console.error('Error loading questions:', error);
+      }
+    }
+
+    function renderQuestionPage() {
+      const card = document.getElementById('quizCard');
+      const q = questions[currentIndex];
+      selectedAnswers.clear();
+
+      if (!q) {
+        card.innerHTML = `
+          <h3>Quiz Complete!</h3>
+          <p style="margin: 15px 0; font-weight: bold; font-size: 1.2rem;">Your Score: ${score} / ${questions.length}</p>
+          <button class="action-btn" onclick="location.reload()">Restart Quiz</button>
+        `;
+        return;
+      }
+
+      let optionsHTML = q.options.map(opt => 
+        `<button class="btn-option" data-value="${opt}">${opt}</button>`
+      ).join('');
+
+      card.innerHTML = `
+        <h3>Question ${currentIndex + 1} of ${questions.length}</h3>
+        <p class="question-text">${q.question}</p>
+        <img src="${q.image}" alt="Question Image ${currentIndex + 1}">
+        <div class="options-grid">${optionsHTML}</div>
+        ${q.type === 'multiple' ? `<button class="action-btn" id="submitBtn" disabled>Submit Answers (0/2)</button>` : ''}
+      `;
+
+      bindQuestionEvents(q);
+    }
+
+    function bindQuestionEvents(q) {
+      const optionBtns = document.querySelectorAll('.btn-option');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (q.type === 'single') {
+        optionBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const choice = btn.getAttribute('data-value');
+            const isCorrect = q.correctAnswer.includes(choice);
+            if (isCorrect) score++;
+            renderResultPage(q, isCorrect);
+          });
+        });
+      } else if (q.type === 'multiple') {
+        optionBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const choice = btn.getAttribute('data-value');
+
+            if (selectedAnswers.has(choice)) {
+              selectedAnswers.delete(choice);
+              btn.classList.remove('selected');
+            } else if (selectedAnswers.size < 2) {
+              selectedAnswers.add(choice);
+              btn.classList.add('selected');
+            }
+
+            submitBtn.textContent = `Submit Answers (${selectedAnswers.size}/2)`;
+            submitBtn.disabled = selectedAnswers.size !== 2;
+          });
+        });
+
+        submitBtn.addEventListener('click', () => {
+          const selectedArray = Array.from(selectedAnswers);
+          const isCorrect = q.correctAnswer.length === selectedArray.length && 
+                            q.correctAnswer.every(val => selectedArray.includes(val));
+          if (isCorrect) score++;
+          renderResultPage(q, isCorrect);
+        });
+      }
+    }
+
+    function renderResultPage(q, isCorrect) {
+      const card = document.getElementById('quizCard');
+
+      card.innerHTML = `
+        <div class="result-badge ${isCorrect ? 'correct' : 'incorrect'}">
+          ${isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+        </div>
+        <img src="${q.answerImage}" alt="Answer Image ${currentIndex + 1}">
+        <div class="answer-info">
+          Correct Answer: ${q.correctAnswer.join(', ')}
+        </div>
+        <button class="action-btn" id="nextBtn">Next Question</button>
+      `;
+
+      document.getElementById('nextBtn').addEventListener('click', () => {
+        currentIndex++;
+        renderQuestionPage();
+      });
+    }
+
+    initQuiz();
+  </script>
+
+</body>
+</html>
