@@ -29,12 +29,18 @@
     .card {
       background: #ffffff;
       border-radius: 12px;
-      padding: 20px;
+      padding: 24px 20px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       align-items: center;
       text-align: center;
+    }
+
+    .card h2 {
+      font-size: 1.5rem;
+      color: #333;
+      margin-bottom: 12px;
     }
 
     .card h3 {
@@ -43,10 +49,14 @@
       margin-bottom: 8px;
     }
 
-    .card .question-text {
-      margin-bottom: 16px;
+    .card p {
       color: #555;
       font-size: 0.95rem;
+      line-height: 1.4;
+    }
+
+    .card .question-text {
+      margin-bottom: 16px;
     }
 
     .card img {
@@ -151,12 +161,26 @@
       try {
         const response = await fetch('questions.json');
         questions = await response.json();
-        renderQuestionPage();
+        renderStartPage();
       } catch (error) {
         console.error('Error loading questions:', error);
       }
     }
 
+    function renderStartPage() {
+        const card = document.getElementById('quizCard');
+  
+        card.innerHTML = `
+            <h2>Welcome to the Quiz!</h2>
+            <p style="margin-bottom: 20px;">Test your knowledge in this quiz. There are ${questions.length} questions in total.</p>
+            <button class="action-btn" id="startBtn">Start Quiz</button>
+        `;
+
+        document.getElementById('startBtn').addEventListener('click', () => {
+            renderQuestionPage();
+        });
+        
+    }
     function renderQuestionPage() {
       const card = document.getElementById('quizCard');
       const q = questions[currentIndex];
